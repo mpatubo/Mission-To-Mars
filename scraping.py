@@ -11,15 +11,22 @@ def scrape_all():
 
     news_title, news_paragraph = mars_news(browser)
 
+    ########   
+#****#2
+#In the def scrape_all() function in your scraping.py file, create a new dictionary in the data dictionary to hold a list of dictionaries with the URL string and title of each hemisphere image
+
+
     # Run all scraping functions and store results in a dictionary
     data = {
         "news_title": news_title,
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(), 
+        "hemispheres": get_hemispheres(browser)
     }
 
+    
     # Stop webdriver and return data
     browser.quit()
     return data
@@ -84,6 +91,9 @@ def featured_image(browser):
 
     return img_url
 
+
+
+
 def mars_facts():
     # Add try/except for error handling
     try:
@@ -99,6 +109,29 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
+
+def get_hemispheres(browser):
+    #scrape
+    #create list
+    
+    hemisphere_list = []
+
+
+######3
+#*****#3
+#Below the def mars_facts() function in the scraping.pyfile, create a function that will scrape the hemisphere data by using your code from the Mission_to_Mars_Challenge.py file. At the end of the function, return the scraped data as a list of dictionaries with the URL string and title of each hemisphere image.
+
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+
+    html = browser.html
+    hemisphere_soup = soup(html, 'html.parser')
+    return hemisphere_list
+
+
+
+#####
+
 
 if __name__ == "__main__":
 
