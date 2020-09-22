@@ -114,7 +114,6 @@ def get_hemispheres(browser):
     #scrape
     #create list
     
-    hemisphere_list = []
 
 
 ######3
@@ -125,8 +124,17 @@ def get_hemispheres(browser):
     browser.visit(url)
 
     html = browser.html
+   
     hemisphere_soup = soup(html, 'html.parser')
-    return hemisphere_list
+   
+    title_list = []
+    for i in range(4):
+        title = hemisphere_soup.find('h3').text  
+        image_link=hemisphere_soup.find('a').get("href")
+        hemi_dictionary={"title":title,"link":image_link}
+        title_list.append(hemi_dictionary)
+   
+    return title_list
 
 
 
