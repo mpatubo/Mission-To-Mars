@@ -1,4 +1,6 @@
 # Import Splinter, BeautifulSoup, and Pandas
+#pip install splinter
+import splinter
 from splinter import Browser
 from bs4 import BeautifulSoup as soup
 import pandas as pd
@@ -23,7 +25,7 @@ def scrape_all():
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
         "last_modified": dt.datetime.now(), 
-        "hemispheres": get_hemispheres(browser)
+        "hemispheres": hemispheres(browser)
     }
 
     
@@ -110,7 +112,7 @@ def mars_facts():
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
 
-def get_hemispheres(browser):
+def hemispheres(browser):
     #scrape
     #create list
     
@@ -123,19 +125,47 @@ def get_hemispheres(browser):
     url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     browser.visit(url)
 
-    html = browser.html
+    #html = browser.html
+    hemisphere_image_urls = []
+    #hemisphere_soup = soup(html, 'html.parser')
    
-    hemisphere_soup = soup(html, 'html.parser')
-   
-    title_list = []
+    
     for i in range(4):
-        title = hemisphere_soup.find('h3').text  
-        image_link=hemisphere_soup.find('a').get("href")
-        hemi_dictionary={"title":title,"link":image_link}
-        title_list.append(hemi_dictionary)
+        #title = hemisphere_soup.find('h3').text  
+        #image_link=hemisphere_soup.find('a').get("href")
+        #hemi_dictionary={"title":title,"link":image_link}
+        #hemisphere_image_urls.append(hemi_dictionary)
    
-    return title_list
+        # Find the elements on each loop to avoid a stale element exception
+        browser.find_by_css("a.product-item h3")[i].click()
+        hemi_data = scrape_hemisphere(browser.html)
+        # Append hemisphere object to list
+        hemisphere_image_urls.append(hemi_data)
+        # Finally, we navigate backwards
+        browser.back()
 
+    return hemisphere_image_urls
+
+def scrape_hemisphere(html_text):
+    # parse html text
+    hemi_soup = soup(html_text, "html.parser")
+
+    # adding try/except for error handling
+    try:
+        title_elem = hemi_soup.find("h2", class_="title").get_text()
+        sample_elem = hemi_soup.find("a", text="Sample").get("href")
+
+    except AttributeError:
+        # Image error will return None, for better front-end handling
+        title_elem = None
+        sample_elem = None
+
+    hemispheres = {
+        "title": title_elem,
+        "img_url": sample_elem
+    }
+
+    return hemispheres
 
 
 #####
